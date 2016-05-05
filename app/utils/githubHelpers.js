@@ -2,27 +2,27 @@ import axios from 'axios'
 
 const id = "YOUR_CLIENT_ID";
 const sec = "YOUR_SECRET_ID";
-const param = "?client_id=" + id + "&client_secret=" + sec;
+const param = `?client_id=${id}&client_secret=${sec}`
 
-function getUserInfo (username) {
-  return axios.get('https://api.github.com/users/' + username + param);
+function getUserInfo (username = 'renandeswarte') {
+  return axios.get(`https://api.github.com/users/${username + param}`);
 }
 
-function getRepos (username) {
-  return axios.get('https://api.github.com/users/' + username + '/repos' + param + '&per_page=100');
+function getRepos (username = 'renandeswarte') {
+  return axios.get(`https://api.github.com/users/${username}/repos${param}&per_page=100`);
 }
 
 function getTotalStars (repos) {
   return repos.data.reduce((prev, current) => prev + current.stargazers_count, 0)
 }
 
-function getPlayersData (player) {
-  return getRepos(player.login)
+function getPlayersData ({login, followers}) {
+  return getRepos(login)
     .then(getTotalStars)
     .then((totalStars) => (
       {
-        followers: player.followers,
-        totalStars: totalStars
+        followers,
+        totalStars
       }
     ))
 }
@@ -33,7 +33,6 @@ function calculateScores (players) {
     players[1].followers * 3 + players[1].totalStars
   ]
 }
-
 
 export function getPlayersInfo(players) {
   return axios.all(players.map((username) => getUserInfo(username)))
